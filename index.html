@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คณิตศาสตร์ มมส | Student Directory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --msu-yellow: #FFD100; --msu-gray: #4A4A4A; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; color: var(--msu-gray); }
+        .msu-card { transition: 0.3s; border-radius: 1.5rem; background: white; border: 2px solid transparent; }
+        .msu-card:hover { transform: translateY(-8px); border-color: var(--msu-yellow); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .active-filter { background: var(--msu-yellow) !important; font-weight: bold; border-color: var(--msu-yellow) !important; }
+    </style>
+</head>
+<body>
+
+    <nav class="bg-white border-b-4 border-[#FFD100] sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center gap-2">
+            <div class="bg-[#FFD100] p-2 rounded-xl shadow-inner"><i data-lucide="calculator"></i></div>
+            <div class="hidden sm:block">
+                <h1 class="font-bold text-lg leading-tight">Mathematics Education</h1>
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Maha Sarakham University</p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <a href="https://docs.google.com/forms/d/1Pdm_zL-bk_JoDPrFmDidskzMA0CsetQMZBfF5jk1gDc/viewform" target="_blank" class="bg-amber-500 text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-amber-600 transition shadow-sm">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> ลงทะเบียน
+            </a>
+            <button onclick="adminToggle()" class="bg-slate-800 text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-slate-900 transition">
+                <i data-lucide="settings" class="w-4 h-4"></i> ผู้ดูแล
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-10">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold text-slate-800 tracking-tight">ทำเนียบนิสิตคณิตศาสตร์</h2>
+            <p class="text-slate-500 mt-2 font-medium">คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
+            <div id="filter-container" class="mt-8 flex flex-wrap justify-center gap-2"></div>
+        </div>
+
+        <div id="loading" class="flex flex-col items-center py-20">
+            <div class="animate-spin rounded-full h-10 w-10 border-4 border-amber-400 border-t-transparent"></div>
+            <p class="text-slate-400 mt-4 text-sm font-semibold">กำลังเชื่อมต่อฐานข้อมูลชีต...</p>
+        </div>
+        <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8"></div>
+    </main>
+
+    <div id="modal" class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl">
+            <div class="bg-[#FFD100] p-5 font-bold flex justify-between items-center">
+                <span class="flex items-center gap-2 text-slate-800"><i data-lucide="edit-3"></i> แก้ไขข้อมูลโดยผู้ดูแล</span>
+                <button onclick="closeModal()" class="hover:bg-black/10 rounded-full p-1"><i data-lucide="x"></i></button>
+            </div>
+            <form id="edit-form" class="p-6 space-y-4">
+                <input type="hidden" id="row_index">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="student_id" placeholder="รหัสนิสิต" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
+                    <input type="text" id="academic_year" placeholder="ปีการศึกษา" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
+                </div>
+                <input type="text" id="name" placeholder="ชื่อ-นามสกุล" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
+                <input type="text" id="photo_url" placeholder="URL รูปภาพ (Direct Link)" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
+                <textarea id="bio" placeholder="ประวัติย่อ/ผลงาน" class="border-2 border-slate-100 p-2 rounded-xl w-full h-24 outline-none focus:border-amber-400"></textarea>
+                <button type="submit" id="save-btn" class="w-full bg-slate-800 text-white py-3 rounded-2xl font-bold shadow-lg">บันทึกการเปลี่ยนแปลง</button>
+                <button type="button" onclick="deleteItem()" class="w-full text-red-500 font-bold text-sm mt-2 hover:underline">ลบข้อมูลคนนี้ออกจากระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyFJ4b2ukqEImmX8HdaQAaqGQMbsHWIL3RGL4lmPMdO0UQjvHuqsyxtGk67-GUhrAk/exec";
+        const ADMIN_PASS = "math2567";
+        let students = [];
+
+        async function load() {
+            try {
+                const res = await fetch(API_URL);
+                students = await res.json();
+                document.getElementById('loading').style.display = 'none';
+                renderFilters();
+                renderGrid('all');
+            } catch (err) { console.error("Error:", err); }
+        }
+
+        function renderGrid(year) {
+            const grid = document.getElementById('grid');
+            const data = year === 'all' ? students : students.filter(s => s.academic_year == year);
+            const isAdmin = localStorage.getItem('mathAdmin');
+
+            grid.innerHTML = data.map(s => `
+                <div class="msu-card overflow-hidden relative group shadow-sm">
+                    ${isAdmin ? `<button onclick="openEdit('${s.row_index}')" class="absolute top-3 right-3 bg-white/90 p-2 rounded-full text-amber-600 z-10 shadow-md hover:scale-110 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
+                    <div class="aspect-[3/4] bg-slate-100 overflow-hidden">
+                        <img src="${s.photo_url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
+                    </div>
+                    <div class="p-5 text-center">
+                        <h3 class="font-bold text-slate-800 truncate">${s.name || 'ไม่ระบุชื่อ'}</h3>
+                        <p class="text-xs text-amber-500 font-bold mt-1 tracking-wider">${s.student_id || '-'}</p>
+                        <div class="mt-2 text-[10px] bg-slate-50 inline-block px-3 py-1 rounded-full text-slate-400 font-bold border border-slate-100">ปี ${s.academic_year}</div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderFilters() {
+            const years = [...new Set(students.map(s => s.academic_year))].sort();
+            const container = document.getElementById('filter-container');
+            container.innerHTML = `<button onclick="setActive(this, 'all')" class="px-6 py-2 rounded-full border-2 border-slate-100 bg-white text-sm transition-all active-filter">ทั้งหมด</button>` + 
+                years.map(y => `<button onclick="setActive(this, '${y}')" class="px-6 py-2 rounded-full border-2 border-slate-100 bg-white text-sm transition-all hover:border-amber-300">${y}</button>`).join('');
+        }
+
+        function setActive(btn, year) {
+            document.querySelectorAll('#filter-container button').forEach(b => b.classList.remove('active-filter'));
+            btn.classList.add('active-filter');
+            renderGrid(year);
+        }
+
+        function adminToggle() {
+            if (localStorage.getItem('mathAdmin')) {
+                localStorage.removeItem('mathAdmin');
+                alert("ออกจากระบบจัดการข้อมูล");
+                location.reload();
+            } else if (prompt("รหัสผ่านผู้ดูแล:") === ADMIN_PASS) {
+                localStorage.setItem('mathAdmin', 'true');
+                location.reload();
+            }
+        }
+
+        function openEdit(idx) {
+            const s = students.find(x => x.row_index == idx);
+            document.getElementById('row_index').value = s.row_index;
+            document.getElementById('student_id').value = s.student_id;
+            document.getElementById('name').value = s.name;
+            document.getElementById('academic_year').value = s.academic_year;
+            document.getElementById('photo_url').value = s.photo_url;
+            document.getElementById('bio').value = s.bio;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        document.getElementById('edit-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('save-btn');
+            btn.disabled = true; btn.innerText = "กำลังอัปเดตชีต...";
+            
+            const payload = {
+                action: "update",
+                row_index: parseInt(document.getElementById('row_index').value),
+                student_id: document.getElementById('student_id').value,
+                name: document.getElementById('name').value,
+                academic_year: document.getElementById('academic_year').value,
+                photo_url: document.getElementById('photo_url').value,
+                bio: document.getElementById('bio').value
+            };
+            
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+            location.reload();
+        };
+
+        async function deleteItem() {
+            if (confirm("ลบข้อมูลคนนี้ออกจากระบบถาวร?")) {
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "delete", row_index: parseInt(document.getElementById('row_index').value) }) });
+                location.reload();
+            }
+        }
+
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        window.onload = load;
+    </script>
+</body>
+</html>
