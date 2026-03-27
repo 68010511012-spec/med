@@ -1,383 +1,353 @@
-<!DOCTYPE html>
-<html lang="th">
+<!doctype html>
+<html lang="th" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คณิตศาสตร์ มมส | ทำเนียบนิสิต</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --msu-yellow: #FFD100; --msu-gray: #4A4A4A; }
-        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; color: var(--msu-gray); }
-        .msu-card { transition: 0.3s; border-radius: 1.5rem; background: white; border: 2px solid transparent; }
-        .msu-card:hover { transform: translateY(-8px); border-color: var(--msu-yellow); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-        .active-filter { background: var(--msu-yellow) !important; font-weight: bold; border-color: var(--msu-yellow) !important; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math MSU | Intelligent Student Portal</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --msu-yellow: #FDB913;
+      --deep-slate: #0f172a;
+      --glass: rgba(255, 255, 255, 0.7);
+    }
+    
+    * { font-family: 'Sarabun', 'Outfit', sans-serif; }
+
+    body { 
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(253, 185, 19, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(244, 63, 94, 0.05) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+      border-radius: 2rem;
+    }
+
+    .bento-item {
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .bento-item:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+      background: white;
+      border-color: var(--msu-yellow);
+    }
+
+    .nav-floating {
+      position: fixed;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 3rem);
+      max-width: 1200px;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .btn-msu {
+      background: var(--msu-yellow);
+      color: #000;
+      font-weight: 700;
+      border-radius: 1rem;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(253, 185, 19, 0.4);
+    }
+
+    .btn-msu:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(253, 185, 19, 0.5);
+    }
+
+    .year-pill {
+      padding: 0.6rem 1.5rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      color: #64748b;
+      transition: all 0.3s;
+    }
+
+    .year-pill.active {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  </style>
 </head>
-<body>
+<body class="pt-32 pb-20">
 
-    <nav class="bg-white border-b-4 border-[#FFD100] sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-md">
-        <div class="flex items-center gap-2">
-            <div class="bg-[#FFD100] p-2 rounded-xl"><i data-lucide="calculator"></i></div>
-            <div class="hidden sm:block">
-                <h1 class="font-bold text-lg leading-tight text-slate-800">Mathematics Education</h1>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Maha Sarakham University</p>
-            </div>
-        </div>
-        <div class="flex gap-2">
-            <a href="https://docs.google.com/forms/d/1Pdm_zL-bk_JoDPrFmDidskzMA0CsetQMZBfF5jk1gDc/viewform" target="_blank" class="bg-amber-500 text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-amber-600 transition shadow-sm">
-                <i data-lucide="user-plus" class="w-4 h-4"></i> ลงทะเบียน
-            </a>
-            <button onclick="adminToggle()" class="bg-slate-800 text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-slate-900 transition">
-                <i data-lucide="settings" class="w-4 h-4"></i> ผู้ดูแล
-            </button>
-        </div>
-    </nav>
+  <nav class="nav-floating px-6 py-4 flex items-center justify-between text-white">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20">
+        <i data-lucide="sigma" class="text-slate-900 w-6 h-6"></i>
+      </div>
+      <span class="font-extrabold text-xl tracking-tight hidden sm:block">MATH <span class="text-yellow-400">MSU</span></span>
+    </div>
+    
+    <div class="flex gap-2">
+      <button onclick="openAdminModal()" class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition-all">
+        <i data-lucide="database" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-10">
-        <div class="text-center mb-12">
-            <h2 class="text-4xl font-extrabold text-slate-800 tracking-tight">ทำเนียบนิสิตคณิตศาสตร์</h2>
-            <p class="text-slate-500 mt-2 font-medium">คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
-            <div id="filter-container" class="mt-8 flex flex-wrap justify-center gap-2"></div>
-        </div>
+  <main class="max-w-7xl mx-auto px-6">
+    
+    <div id="hero-section" class="mb-16 text-center">
+      <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight mb-4">
+        Student <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500">Intelligence</span>
+      </h1>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">
+        ระบบฐานข้อมูลนิสิตอัจฉริยะ ภาควิชาคณิตศาสตร์ มหาวิทยาลัยมหาสารคาม
+      </p>
+    </div>
 
-        <div id="loading" class="flex flex-col items-center py-20">
-            <div class="animate-spin rounded-full h-10 w-10 border-4 border-amber-400 border-t-transparent"></div>
-            <p class="text-slate-400 mt-4 text-sm font-semibold">กำลังเชื่อมต่อฐานข้อมูล...</p>
-        </div>
-        <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8"></div>
-    </main>
+    <div id="view-home" class="space-y-12">
+      <div class="flex justify-center">
+        <div class="inline-flex p-1.5 bg-slate-200/50 backdrop-blur-md rounded-2xl" id="year-tabs-container">
+          </div>
+      </div>
 
-    <div id="modal" class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl">
-            <div class="bg-[#FFD100] p-5 font-bold flex justify-between items-center">
-                <span class="flex items-center gap-2 text-slate-800"><i data-lucide="edit-3"></i> แก้ไขข้อมูลโดยผู้ดูแล</span>
-                <button onclick="closeModal()" class="hover:bg-black/10 rounded-full p-1"><i data-lucide="x"></i></button>
-            </div>
-            <form id="edit-form" class="p-6 space-y-4">
-                <input type="hidden" id="row_index">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-xs text-slate-500 font-bold">รหัสนิสิต</label>
-                        <input type="text" id="student_id" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs text-slate-500 font-bold">ปีการศึกษา</label>
-                        <input type="text" id="academic_year" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
-                    </div>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-500 font-bold">ชื่อ-นามสกุล</label>
-                    <input type="text" id="name" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-500 font-bold">ลิงก์รูปภาพ (แก้เป็นลิงก์อื่นได้)</label>
-                    <input type="text" id="photo_url" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400 text-xs">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-500 font-bold">ประวัติย่อ</label>
-                    <textarea id="bio" class="border-2 border-slate-100 p-2 rounded-xl w-full h-24 outline-none focus:border-amber-400"></textarea>
-                </div>
-                <button type="submit" id="save-btn" class="w-full bg-slate-800 text-white py-3 rounded-2xl font-bold shadow-lg hover:bg-slate-900 transition">บันทึกการเปลี่ยนแปลง</button>
-                <button type="button" onclick="deleteItem()" class="w-full text-red-500 font-bold text-sm mt-2 hover:underline">ลบข้อมูลคนนี้ทิ้ง</button>
-            </form>
+      <div id="student-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         </div>
     </div>
 
-    <script>
-        // 👇👇👇 นำ Web App URL อันใหม่ที่เพิ่ง Deploy มาวางตรงนี้ครับ 👇👇👇
-        const API_URL = "<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คณิตศาสตร์ มมส | ทำเนียบนิสิต</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --msu-yellow: #FFD100; --msu-gray: #4A4A4A; }
-        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; color: var(--msu-gray); }
-        .msu-card { transition: 0.3s; border-radius: 1.5rem; background: white; border: 2px solid transparent; }
-        .msu-card:hover { transform: translateY(-8px); border-color: var(--msu-yellow); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-        .active-filter { background: var(--msu-yellow) !important; font-weight: bold; border-color: var(--msu-yellow) !important; }
-    </style>
-</head>
-<body>
+    <div id="view-profile" class="hidden max-w-5xl mx-auto animate-in fade-in zoom-in duration-500">
+      <button onclick="goHome()" class="mb-8 flex items-center gap-2 font-bold text-slate-400 hover:text-slate-900 transition-all group">
+        <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i> BACK TO EXPLORE
+      </button>
 
-    <nav class="bg-white border-b-4 border-[#FFD100] sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-md">
-        <div class="flex items-center gap-2">
-            <div class="bg-[#FFD100] p-2 rounded-xl"><i data-lucide="calculator"></i></div>
-            <div class="hidden sm:block">
-                <h1 class="font-bold text-lg leading-tight text-slate-800">Mathematics Education</h1>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Maha Sarakham University</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-1 glass-card p-8 flex flex-col items-center text-center">
+          <div class="relative mb-6">
+            <div class="absolute inset-0 bg-yellow-400 rounded-[2.5rem] rotate-6"></div>
+            <img id="profile-photo" src="" class="relative w-48 h-48 object-cover rounded-[2rem] border-4 border-white shadow-2xl">
+          </div>
+          <h2 id="profile-name" class="text-2xl font-bold text-slate-900 mb-1"></h2>
+          <p id="profile-name-en" class="text-slate-400 font-semibold mb-4 uppercase text-xs tracking-widest"></p>
+          <div id="profile-year-badge" class="bg-slate-900 text-white px-4 py-1.5 rounded-full text-xs font-bold mb-6"></div>
+          
+          <div class="w-full space-y-3 pt-6 border-t border-slate-100">
+            <div class="flex justify-between items-center bg-white/50 p-3 rounded-2xl">
+              <span class="text-slate-400 text-xs font-bold">GPAX</span>
+              <span id="profile-gpa" class="font-extrabold text-slate-900 text-lg"></span>
             </div>
-        </div>
-        <div class="flex gap-2">
-            <a href="https://docs.google.com/forms/d/1Pdm_zL-bk_JoDPrFmDidskzMA0CsetQMZBfF5jk1gDc/viewform" target="_blank" class="bg-amber-500 text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-amber-600 transition shadow-sm">
-                <i data-lucide="user-plus" class="w-4 h-4"></i> ลงทะเบียน
-            </a>
-            <button onclick="adminToggle()" class="bg-slate-800 text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-slate-900 transition">
-                <i data-lucide="settings" class="w-4 h-4"></i> ผู้ดูแล
-            </button>
-        </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto px-4 py-10">
-        <div class="text-center mb-12">
-            <h2 class="text-4xl font-extrabold text-slate-800 tracking-tight">ทำเนียบนิสิตคณิตศาสตร์</h2>
-            <p class="text-slate-500 mt-2 font-medium">คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
-            <div id="filter-container" class="mt-8 flex flex-wrap justify-center gap-2"></div>
+          </div>
         </div>
 
-        <div id="loading" class="flex flex-col items-center py-20">
-            <div class="animate-spin rounded-full h-10 w-10 border-4 border-amber-400 border-t-transparent"></div>
-            <p class="text-slate-400 mt-4 text-sm font-semibold">กำลังเชื่อมต่อฐานข้อมูล...</p>
-        </div>
-        <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8"></div>
-    </main>
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="glass-card p-6 sm:col-span-2">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <i data-lucide="info" class="w-4 h-4 text-yellow-500"></i> About Student
+            </h3>
+            <p id="profile-bio" class="text-slate-600 leading-relaxed text-lg italic"></p>
+          </div>
 
-    <div id="modal" class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl">
-            <div class="bg-[#FFD100] p-5 font-bold flex justify-between items-center">
-                <span class="flex items-center gap-2 text-slate-800"><i data-lucide="edit-3"></i> แก้ไขข้อมูลโดยผู้ดูแล</span>
-                <button onclick="closeModal()" class="hover:bg-black/10 rounded-full p-1"><i data-lucide="x"></i></button>
+          <div class="glass-card p-6">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4 text-yellow-500"></i> Contact
+            </h3>
+            <div id="profile-email" class="text-slate-700 font-bold truncate"></div>
+            <div id="profile-phone" class="text-slate-500 text-sm mt-1"></div>
+          </div>
+
+          <div class="glass-card p-6">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <i data-lucide="hash" class="w-4 h-4 text-yellow-500"></i> ID Number
+            </h3>
+            <div id="profile-sid" class="text-2xl font-black text-slate-900"></div>
+          </div>
+
+          <div class="glass-card p-6 sm:col-span-2 flex items-center justify-between bg-gradient-to-br from-slate-900 to-slate-800 text-white border-none shadow-xl shadow-slate-200">
+            <div>
+              <p class="text-slate-400 text-xs font-bold uppercase mb-1">Status</p>
+              <p class="text-xl font-bold">นิสิตปัจจุบัน (Active)</p>
             </div>
-            <form id="edit-form" class="p-6 space-y-4">
-                <input type="hidden" id="row_index">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-xs text-slate-500 font-bold">รหัสนิสิต</label>
-                        <input type="text" id="student_id" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs text-slate-500 font-bold">ปีการศึกษา</label>
-                        <input type="text" id="academic_year" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
-                    </div>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-500 font-bold">ชื่อ-นามสกุล</label>
-                    <input type="text" id="name" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-500 font-bold">ลิงก์รูปภาพ (แก้เป็นลิงก์อื่นได้)</label>
-                    <input type="text" id="photo_url" class="border-2 border-slate-100 p-2 rounded-xl w-full outline-none focus:border-amber-400 text-xs">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-500 font-bold">ประวัติย่อ</label>
-                    <textarea id="bio" class="border-2 border-slate-100 p-2 rounded-xl w-full h-24 outline-none focus:border-amber-400"></textarea>
-                </div>
-                <button type="submit" id="save-btn" class="w-full bg-slate-800 text-white py-3 rounded-2xl font-bold shadow-lg hover:bg-slate-900 transition">บันทึกการเปลี่ยนแปลง</button>
-                <button type="button" onclick="deleteItem()" class="w-full text-red-500 font-bold text-sm mt-2 hover:underline">ลบข้อมูลคนนี้ทิ้ง</button>
-            </form>
+            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
+              <div class="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </main>
 
-    <script>
-        // 👇👇👇 นำ Web App URL อันใหม่ที่เพิ่ง Deploy มาวางตรงนี้ครับ 👇👇👇
-        const API_URL = "วาง_URL_ใหม่ตรงนี้"; 
-        const ADMIN_PASS = "math2567";
-        let students = [];
+  <div id="modal-admin" class="hidden fixed inset-0 z-[110] p-4 flex items-center justify-center bg-slate-950/40 backdrop-blur-xl">
+    <div class="glass-card w-full max-w-xl p-10 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-400/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+      
+      <div class="flex justify-between items-center mb-8 relative">
+        <h2 class="text-3xl font-black text-slate-900 italic">REGISTER</h2>
+        <button onclick="closeModal('modal-admin')" class="p-2 hover:bg-slate-100 rounded-full"><i data-lucide="x"></i></button>
+      </div>
+      
+      <form id="student-form" onsubmit="submitForm(event)" class="space-y-6 relative">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input id="f-name" class="w-full bg-white/80 border border-slate-200 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-yellow-400 transition-all" placeholder="ชื่อ-นามสกุล (TH)" required>
+          <input id="f-sid" class="w-full bg-white/80 border border-slate-200 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-yellow-400 transition-all" placeholder="รหัสนิสิต" required>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input id="f-year" type="number" class="w-full bg-white/80 border border-slate-200 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-yellow-400 transition-all" placeholder="ปีการศึกษา (25XX)" required>
+          <input id="f-photo" class="w-full bg-white/80 border border-slate-200 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-yellow-400 transition-all" placeholder="Photo URL">
+        </div>
+        <input id="f-email" type="email" class="w-full bg-white/80 border border-slate-200 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-yellow-400 transition-all" placeholder="Email Address">
+        
+        <button type="submit" id="submit-btn" class="w-full btn-msu py-5 text-lg">ENROLL STUDENT</button>
+      </form>
+    </div>
+  </div>
 
-        async function load() {
-            try {
-                const res = await fetch(API_URL);
-                students = await res.json();
-                document.getElementById('loading').style.display = 'none';
-                renderFilters();
-                renderGrid('all');
-            } catch (err) { 
-                console.error("Error:", err);
-                document.getElementById('loading').innerHTML = "<p class='text-red-500'>โหลดข้อมูลไม่สำเร็จ โปรดตรวจสอบ API URL</p>";
-            }
+  <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6C5SsoHCxo4X0LDKW4pjj1XLJX9UNKXHEinvSzO0Zcg3NyHhZHsZbB1FoHVfhCTZ_/exec';
+    let allStudents = [];
+
+    async function loadData() {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        const result = await response.json();
+        if (result.status === 'success') {
+          allStudents = result.data;
+          setupTabs();
+          renderGrid('all');
         }
+      } catch (err) { console.error(err); }
+    }
 
-        function renderGrid(year) {
-            const grid = document.getElementById('grid');
-            const data = year === 'all' ? students : students.filter(s => s.academic_year == year);
-            const isAdmin = localStorage.getItem('mathAdmin');
+    function setupTabs() {
+      const container = document.getElementById('year-tabs-container');
+      const years = [...new Set(allStudents.map(s => s.academic_year))].sort((a,b) => b - a);
+      container.innerHTML = `<button class="year-pill active" onclick="filterByYear('all')" id="tab-all">All</button>`;
+      years.forEach(year => {
+        if(!year) return;
+        container.innerHTML += `<button class="year-pill" onclick="filterByYear('${year}')" id="tab-${year}">${year}</button>`;
+      });
+    }
 
-            grid.innerHTML = data.map(s => `
-                <div class="msu-card overflow-hidden relative group shadow-sm">
-                    ${isAdmin ? `<button onclick="openEdit('${s.row_index}')" class="absolute top-3 right-3 bg-white/90 p-2 rounded-full text-amber-600 z-10 shadow-md hover:scale-110 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
-                    <div class="aspect-[3/4] bg-slate-100 overflow-hidden relative">
-                        <img src="${s.photo_url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
-                    </div>
-                    <div class="p-5 text-center">
-                        <h3 class="font-bold text-slate-800 truncate">${s.name || 'ไม่ระบุชื่อ'}</h3>
-                        <p class="text-xs text-amber-500 font-bold mt-1 tracking-wider">${s.student_id || '-'}</p>
-                        <div class="mt-2 text-[10px] bg-slate-50 inline-block px-3 py-1 rounded-full text-slate-500 font-bold border border-slate-100">ปี ${s.academic_year || '-'}</div>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
+    function filterByYear(year) {
+      document.querySelectorAll('.year-pill').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${year}`).classList.add('active');
+      renderGrid(year);
+    }
 
-        function renderFilters() {
-            const years = [...new Set(students.map(s => s.academic_year).filter(y => y !== ""))].sort();
-            const container = document.getElementById('filter-container');
-            container.innerHTML = `<button onclick="setActive(this, 'all')" class="px-6 py-2 rounded-full border-2 border-slate-100 bg-white text-sm transition-all active-filter">ทั้งหมด</button>` + 
-                years.map(y => `<button onclick="setActive(this, '${y}')" class="px-6 py-2 rounded-full border-2 border-slate-100 bg-white text-sm transition-all hover:border-amber-300">${y}</button>`).join('');
-        }
+    function renderGrid(year) {
+      const grid = document.getElementById('student-grid');
+      grid.innerHTML = '';
+      const filtered = year === 'all' ? allStudents : allStudents.filter(s => s.academic_year == year);
+      
+      filtered.forEach((student, index) => {
+        const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.name)}&background=FDB913&color=0f172a&size=256&bold=true`;
+        const card = document.createElement('div');
+        card.className = 'glass-card bento-item p-6 cursor-pointer flex flex-col items-center';
+        card.style.animation = `fadeIn 0.6s ease forwards ${index * 0.1}s`;
+        card.onclick = () => openProfile(student.id);
+        card.innerHTML = `
+          <div class="w-24 h-24 mb-6 rounded-[1.5rem] overflow-hidden rotate-3 hover:rotate-0 transition-transform shadow-lg">
+            <img src="${student.photo_url || fallbackImg}" class="w-full h-full object-cover">
+          </div>
+          <h3 class="font-bold text-slate-800 text-center line-clamp-1">${student.name}</h3>
+          <p class="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">${student.student_id}</p>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-        function setActive(btn, year) {
-            document.querySelectorAll('#filter-container button').forEach(b => b.classList.remove('active-filter'));
-            btn.classList.add('active-filter');
-            renderGrid(year);
-        }
+    function openProfile(id) {
+      const student = allStudents.find(s => s.id == id);
+      if(!student) return;
 
-        function adminToggle() {
-            if (localStorage.getItem('mathAdmin')) {
-                localStorage.removeItem('mathAdmin');
-                location.reload();
-            } else if (prompt("รหัสผ่านผู้ดูแล:") === ADMIN_PASS) {
-                localStorage.setItem('mathAdmin', 'true');
-                location.reload();
-            }
-        }
+      const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.name)}&background=FDB913&color=0f172a&size=512&bold=true`;
+      document.getElementById('profile-photo').src = student.photo_url || fallbackImg;
+      document.getElementById('profile-name').innerText = student.name;
+      document.getElementById('profile-name-en').innerText = student.name_en || 'MSU Mathematics Student';
+      document.getElementById('profile-year-badge').innerText = 'CLASS OF ' + student.academic_year;
+      document.getElementById('profile-sid').innerText = student.student_id;
+      document.getElementById('profile-gpa').innerText = student.gpa || 'N/A';
+      document.getElementById('profile-email').innerText = (student.email || 'no-reply@msu.ac.th').toLowerCase();
+      document.getElementById('profile-phone').innerText = student.phone || '0XX-XXX-XXXX';
+      document.getElementById('profile-bio').innerText = student.bio || '“The only way to learn mathematics is to do mathematics.” – นิสิตภาควิชาคณิตศาสตร์ผู้มุ่งมั่น';
 
-        function openEdit(idx) {
-            const s = students.find(x => x.row_index == idx);
-            document.getElementById('row_index').value = s.row_index;
-            document.getElementById('student_id').value = s.student_id;
-            document.getElementById('name').value = s.name;
-            document.getElementById('academic_year').value = s.academic_year;
-            document.getElementById('photo_url').value = s.photo_url;
-            document.getElementById('bio').value = s.bio;
-            document.getElementById('modal').classList.remove('hidden');
-        }
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('hero-section').classList.add('hidden');
+      document.getElementById('view-profile').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        document.getElementById('edit-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('save-btn');
-            btn.disabled = true; btn.innerText = "กำลังอัปเดตชีต...";
-            
-            const payload = {
-                action: "update",
-                row_index: parseInt(document.getElementById('row_index').value),
-                student_id: document.getElementById('student_id').value,
-                name: document.getElementById('name').value,
-                academic_year: document.getElementById('academic_year').value,
-                photo_url: document.getElementById('photo_url').value,
-                bio: document.getElementById('bio').value
-            };
-            
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-            location.reload();
-        };
+    function goHome() {
+      document.getElementById('view-profile').classList.add('hidden');
+      document.getElementById('view-home').classList.remove('hidden');
+      document.getElementById('hero-section').classList.remove('hidden');
+    }
 
-        async function deleteItem() {
-            if (confirm("ลบข้อมูลคนนี้ออกจากระบบถาวร?")) {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "delete", row_index: parseInt(document.getElementById('row_index').value) }) });
-                location.reload();
-            }
-        }
+    function openAdminModal() {
+      const pwd = prompt("Access Key:");
+      if(pwd === "mathmsu") document.getElementById('modal-admin').classList.remove('hidden');
+    }
 
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        window.onload = load;
-    </script>
-</body>
-</html>"; 
-        const ADMIN_PASS = "math2567";
-        let students = [];
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        async function load() {
-            try {
-                const res = await fetch(API_URL);
-                students = await res.json();
-                document.getElementById('loading').style.display = 'none';
-                renderFilters();
-                renderGrid('all');
-            } catch (err) { 
-                console.error("Error:", err);
-                document.getElementById('loading').innerHTML = "<p class='text-red-500'>โหลดข้อมูลไม่สำเร็จ โปรดตรวจสอบ API URL</p>";
-            }
-        }
+    async function submitForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.innerText = "PROCESSING...";
+      btn.disabled = true;
 
-        function renderGrid(year) {
-            const grid = document.getElementById('grid');
-            const data = year === 'all' ? students : students.filter(s => s.academic_year == year);
-            const isAdmin = localStorage.getItem('mathAdmin');
+      const data = {
+        action: 'add',
+        name: document.getElementById('f-name').value,
+        student_id: document.getElementById('f-sid').value,
+        academic_year: document.getElementById('f-year').value,
+        photo_url: document.getElementById('f-photo').value,
+        email: document.getElementById('f-email').value,
+      };
 
-            grid.innerHTML = data.map(s => `
-                <div class="msu-card overflow-hidden relative group shadow-sm">
-                    ${isAdmin ? `<button onclick="openEdit('${s.row_index}')" class="absolute top-3 right-3 bg-white/90 p-2 rounded-full text-amber-600 z-10 shadow-md hover:scale-110 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
-                    <div class="aspect-[3/4] bg-slate-100 overflow-hidden relative">
-                        <img src="${s.photo_url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
-                    </div>
-                    <div class="p-5 text-center">
-                        <h3 class="font-bold text-slate-800 truncate">${s.name || 'ไม่ระบุชื่อ'}</h3>
-                        <p class="text-xs text-amber-500 font-bold mt-1 tracking-wider">${s.student_id || '-'}</p>
-                        <div class="mt-2 text-[10px] bg-slate-50 inline-block px-3 py-1 rounded-full text-slate-500 font-bold border border-slate-100">ปี ${s.academic_year || '-'}</div>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
+      try {
+        await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+        alert('Data stored successfully!');
+        location.reload();
+      } catch (err) { 
+        alert('Error saving data'); 
+        btn.innerText = "ENROLL STUDENT";
+        btn.disabled = false;
+      }
+    }
 
-        function renderFilters() {
-            const years = [...new Set(students.map(s => s.academic_year).filter(y => y !== ""))].sort();
-            const container = document.getElementById('filter-container');
-            container.innerHTML = `<button onclick="setActive(this, 'all')" class="px-6 py-2 rounded-full border-2 border-slate-100 bg-white text-sm transition-all active-filter">ทั้งหมด</button>` + 
-                years.map(y => `<button onclick="setActive(this, '${y}')" class="px-6 py-2 rounded-full border-2 border-slate-100 bg-white text-sm transition-all hover:border-amber-300">${y}</button>`).join('');
-        }
+    lucide.createIcons();
+    loadData();
+  </script>
 
-        function setActive(btn, year) {
-            document.querySelectorAll('#filter-container button').forEach(b => b.classList.remove('active-filter'));
-            btn.classList.add('active-filter');
-            renderGrid(year);
-        }
-
-        function adminToggle() {
-            if (localStorage.getItem('mathAdmin')) {
-                localStorage.removeItem('mathAdmin');
-                location.reload();
-            } else if (prompt("รหัสผ่านผู้ดูแล:") === ADMIN_PASS) {
-                localStorage.setItem('mathAdmin', 'true');
-                location.reload();
-            }
-        }
-
-        function openEdit(idx) {
-            const s = students.find(x => x.row_index == idx);
-            document.getElementById('row_index').value = s.row_index;
-            document.getElementById('student_id').value = s.student_id;
-            document.getElementById('name').value = s.name;
-            document.getElementById('academic_year').value = s.academic_year;
-            document.getElementById('photo_url').value = s.photo_url;
-            document.getElementById('bio').value = s.bio;
-            document.getElementById('modal').classList.remove('hidden');
-        }
-
-        document.getElementById('edit-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('save-btn');
-            btn.disabled = true; btn.innerText = "กำลังอัปเดตชีต...";
-            
-            const payload = {
-                action: "update",
-                row_index: parseInt(document.getElementById('row_index').value),
-                student_id: document.getElementById('student_id').value,
-                name: document.getElementById('name').value,
-                academic_year: document.getElementById('academic_year').value,
-                photo_url: document.getElementById('photo_url').value,
-                bio: document.getElementById('bio').value
-            };
-            
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-            location.reload();
-        };
-
-        async function deleteItem() {
-            if (confirm("ลบข้อมูลคนนี้ออกจากระบบถาวร?")) {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "delete", row_index: parseInt(document.getElementById('row_index').value) }) });
-                location.reload();
-            }
-        }
-
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        window.onload = load;
-    </script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </body>
 </html>
