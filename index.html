@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบลงทะเบียนสังเกตการสอน</title>
   
-  <!-- แก้ไขเวอร์ชัน Tailwind ไม่ให้หน้าขาว -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  
-  <!-- แก้ไขสคริปต์ Google ลบ async defer ออกให้โหลดทันที -->
   <script src="https://accounts.google.com/gsi/client"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,7 +41,6 @@
   </script>
 </head>
 <body class="h-full overflow-auto" style="background: #0f1729;">
-  <!-- BG Gradient Orbs -->
   <div style="position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;">
    <div style="position:absolute;width:600px;height:600px;top:-10%;left:-5%;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.15),transparent 70%);"></div>
    <div style="position:absolute;width:500px;height:500px;bottom:-10%;right:-5%;border-radius:50%;background:radial-gradient(circle,rgba(236,72,153,0.12),transparent 70%);"></div>
@@ -53,7 +49,6 @@
 
   <div id="app-wrapper" class="relative z-10 h-full w-full">
    
-   <!-- ADMIN LOGIN SCREEN -->
    <div id="admin-login-screen" class="hidden h-full w-full flex items-center justify-center p-6">
     <div class="text-center max-w-md w-full fade-in">
      <div class="mb-8">
@@ -71,7 +66,6 @@
     </div>
    </div>
 
-   <!-- LOGIN SCREEN -->
    <div id="login-screen" class="h-full w-full flex items-center justify-center p-6">
     <div class="text-center max-w-md w-full fade-in">
      <div class="mb-8">
@@ -81,7 +75,6 @@
       <h1 class="text-3xl font-bold text-white mb-3" style="font-family:'Outfit',sans-serif;">ระบบลงทะเบียนสังเกตการสอน</h1>
       <p class="text-gray-400 text-lg mb-6">กรุณาเข้าสู่ระบบด้วยอีเมลองค์กร (@msu.ac.th)</p>
       
-      <!-- ปุ่ม Google Login ของแท้ -->
       <div id="google-login-button" class="flex justify-center mt-4"></div>
       
      </div>
@@ -89,7 +82,6 @@
     </div>
    </div>
 
-   <!-- MAIN APP -->
    <div id="main-app" class="hidden h-full w-full">
     <header class="glass sticky top-0 z-50 px-6 py-4">
      <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -115,7 +107,6 @@
     </header>
 
     <main class="max-w-6xl mx-auto px-6 py-8">
-     <!-- Stats -->
      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
       <div class="glass-card rounded-xl p-4 fade-in stagger-1">
        <div class="flex items-center gap-2 mb-1"><i data-lucide="school" style="width:16px;height:16px;color:#818cf8;"></i><span class="text-gray-400 text-xs">โรงเรียนทั้งหมด</span></div>
@@ -135,24 +126,24 @@
       </div>
      </div>
 
-     <!-- My Registrations -->
      <div id="my-section" class="hidden mb-8">
       <h2 class="text-white font-bold text-lg mb-4 flex items-center gap-2"><i data-lucide="bookmark" style="width:20px;height:20px;color:#818cf8;"></i>การลงทะเบียนของฉัน</h2>
       <div id="my-list" class="grid gap-3"></div>
      </div>
 
-     <!-- Schools Grid -->
      <div class="flex justify-between items-center mb-4">
        <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="map-pin" style="width:20px;height:20px;color:#f472b6;"></i>รายชื่อโรงเรียน</h2>
        <button onclick="fetchRegistrations()" class="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> รีเฟรชข้อมูล</button>
      </div>
      <div id="schools-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <p class="text-gray-400 text-sm col-span-full">กำลังโหลดข้อมูล...</p>
+        <div class="col-span-full flex flex-col items-center justify-center py-16">
+          <div class="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
+          <p class="text-indigo-300 text-sm animate-pulse font-medium">กำลังเตรียมข้อมูลโรงเรียน...</p>
+        </div>
      </div>
     </main>
    </div>
 
-   <!-- ADMIN DASHBOARD SCREEN -->
    <div id="admin-screen" class="hidden h-full w-full overflow-auto">
     <header class="glass sticky top-0 z-50 px-6 py-4">
      <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -180,7 +171,6 @@
    </div>
   </div>
 
-  <!-- Toast Container & Modal -->
   <div id="toast-container" class="toast-container"></div>
   <div id="confirm-modal" class="hidden confirm-overlay"></div>
 
@@ -189,21 +179,28 @@
 const GOOGLE_CLIENT_ID = '257299402825-el5mheppr6fnd09mebi7vmgulilqg9ru.apps.googleusercontent.com';
 
 // ⚠️ สำคัญ: ใส่ Web App URL ที่ได้จาก Google Apps Script ด้านล่างนี้
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdXcrJeKUbzb3TC254TLKc_1unir20tqFE3EleyPxxxHqlmJswunuUi7nDlkRnrO7z/exec'; 
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1cvQU-JqHferySX0kJv-J9_VKEyiHUpgCIX6Q_0r19Mvpay3xHnwurpe9ZPBJXJW2/exec'; 
 
 const ALLOWED_DOMAIN = 'msu.ac.th'; // กำหนดโดเมนมหาวิทยาลัยมหาสารคาม
 const ADMIN_PASSWORD = 'admin'; // รหัสผ่านสำหรับเข้าหน้า Admin Dashboard
+
+// === ฝังข้อมูลโรงเรียนไว้ใน HTML เลย เพื่อความรวดเร็วขั้นสุด ===
+const SCHOOLS = [
+  { id: 's1', name: 'โรงเรียนสาธิตเทศบาลโพธิ์ศรี', district: 'อำเภอเมืองมหาสารคาม', level: 'ไม่ทราบ', capacity: 1, emoji: '🏫', color: '#8b5cf6' },
+  { id: 's2', name: 'โรงเรียนเทศบาลบ้านส่องนางใย', district: 'อำเภอเมืองมหาสารคาม', level: 'ไม่ทราบ', capacity: 5, emoji: '🏫', color: '#ec4899' },
+  { id: 's3', name: 'โรงเรียนสาธิตมหาวิทยาลัยมหาสารคาม (ฝ่ายมัธยม)', district: 'อำเภอเมืองมหาสารคาม', level: 'ไม่ทราบ', capacity: 12, emoji: '🏫', color: '#f97316' },
+  { id: 's4', name: 'โรงเรียนมหาชัยพิทยาคาร', district: 'อำเภอเมืองมหาสารคาม', level: 'ไม่ทราบ', capacity: 8, emoji: '🏫', color: '#f59e0b' },
+  { id: 's5', name: 'โรงเรียนสาธิตมหาวิทยาลัยราชภัฏมหาสารคาม', district: 'อำเภอเมืองมหาสารคาม', level: 'ไม่ทราบ', capacity: 6, emoji: '🏫', color: '#10b981' }
+];
 
 // === VARIABLES ===
 let currentUser = null;
 let currentAdminPassword = null;
 let allRegistrations = [];
-let SCHOOLS = []; // ข้อมูลโรงเรียนจะถูกดึงมาจาก Google Sheets
 
 window.onload = function () {
   lucide.createIcons();
   
-  // สร้างปุ่ม Google Login
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: handleCredentialResponse
@@ -213,8 +210,8 @@ window.onload = function () {
     { theme: "outline", size: "large", shape: "pill", text: "signin_with" }
   );
 
-  // โหลดข้อมูลอัตโนมัติเมื่อเปิดเว็บ
-  if(GOOGLE_APP_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbxP16LXPY6NmgQWuukq5KrXftgczYwEoQSVPlCfrZ4ringR1nM3DZWnO_OsIqDFASAf/exec') {
+  // ดึงข้อมูลการลงทะเบียนอัตโนมัติตั้งแต่เปิดเว็บ
+  if(GOOGLE_APP_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbx1cvQU-JqHferySX0kJv-J9_VKEyiHUpgCIX6Q_0r19Mvpay3xHnwurpe9ZPBJXJW2/exec') {
     fetchRegistrations();
   }
 };
@@ -246,7 +243,8 @@ function handleCredentialResponse(response) {
   document.getElementById('user-avatar').textContent = payload.name.charAt(0).toUpperCase();
   document.getElementById('user-display').classList.remove('hidden');
   
-  fetchRegistrations();
+  // โชว์หน้าจอทันที ไม่ต้องรอ
+  renderSchools();
 }
 
 function handleLogout() {
@@ -257,21 +255,30 @@ function handleLogout() {
 
 // === DATA API LOGIC (Google Apps Script) ===
 async function fetchRegistrations() {
-  if(GOOGLE_APP_SCRIPT_URL === 'ใส่_WEB_APP_URL_จาก_GAS_ของคุณที่นี่') return;
+  if(GOOGLE_APP_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx1cvQU-JqHferySX0kJv-J9_VKEyiHUpgCIX6Q_0r19Mvpay3xHnwurpe9ZPBJXJW2/exec') return;
   
+  // 🔥 สเต็ปที่ 1: ดึงจากความจำเครื่อง (ลื่นปรี๊ด 0.01 วิ)
+  const cachedData = localStorage.getItem('msuRegistrations');
+  if (cachedData) {
+    allRegistrations = JSON.parse(cachedData);
+    if (currentUser) renderSchools();
+    if (currentAdminPassword) renderAdminDashboard();
+  }
+  
+  // 🔥 สเต็ปที่ 2: แอบไปดึงข้อมูลใหม่จากฐานข้อมูล
   try {
     const response = await fetch(GOOGLE_APP_SCRIPT_URL);
     const data = await response.json();
     
-    // รับค่าจาก Google Sheets 
-    allRegistrations = data.registrations || [];
-    SCHOOLS = data.schools || [];
+    // อัปเดตและเซฟลงความจำ
+    allRegistrations = data || [];
+    localStorage.setItem('msuRegistrations', JSON.stringify(allRegistrations));
     
+    // รีเฟรชหน้าจอเผื่อมีคนอื่นกดลงทะเบียนไป
     if (currentUser) renderSchools();
     if (currentAdminPassword) renderAdminDashboard();
   } catch (error) {
     console.error("Fetch Error: ", error);
-    showToast('ไม่สามารถโหลดข้อมูลได้ โปรดตรวจสอบ URL ของ Apps Script', 'error');
   }
 }
 
@@ -284,7 +291,6 @@ async function registerSchool(schoolId) {
   showToast('กำลังบันทึกข้อมูล...', 'warn');
 
   try {
-    // ใช้ no-cors เพราะ GAS จะ Redirect ข้าม Origin
     await fetch(GOOGLE_APP_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
@@ -297,9 +303,8 @@ async function registerSchool(schoolId) {
       })
     });
     
-    // ด้วย no-cors เราจะไม่ได้ response สเตตัสจริง ให้สมมติว่าสำเร็จ
     showToast(`ลงทะเบียน ${sc.name} สำเร็จ! กำลังอัปเดต...`);
-    setTimeout(fetchRegistrations, 1500); // ดีเลย์ให้ GAS เขียนลงชีทเสร็จก่อน
+    setTimeout(fetchRegistrations, 1500);
   } catch (error) {
     showToast('เกิดข้อผิดพลาด กรุณาลองใหม่', 'error');
     document.querySelectorAll('.btn-register').forEach(b => b.disabled = false);
@@ -438,11 +443,6 @@ function renderSchools() {
     myList.innerHTML = '';
   }
 
-  if (SCHOOLS.length === 0) {
-    grid.innerHTML = '<p class="text-gray-400 text-sm col-span-full">ไม่พบข้อมูลโรงเรียน หรือกำลังโหลด...</p>';
-    return;
-  }
-
   grid.innerHTML = SCHOOLS.map((sc, i) => {
     const regs = getSchoolRegistrations(sc.id);
     const count = regs.length;
@@ -461,7 +461,7 @@ function renderSchools() {
       btnHtml = `<button onclick="registerSchool('${sc.id}')" class="btn-register w-full py-2.5 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,${sc.color || '#6366f1'},${sc.color || '#6366f1'}dd);">ลงทะเบียน</button>`;
     }
 
-    const levelColors = { 'อนุบาล': 'rgba(251,191,36,0.15);color:#fbbf24', 'ประถม': 'rgba(16,185,129,0.15);color:#34d399', 'มัธยม': 'rgba(99,102,241,0.15);color:#818cf8', 'ประถม-มัธยม': 'rgba(14,165,233,0.15);color:#38bdf8' };
+    const levelColors = { 'ไม่ทราบ': 'rgba(255,255,255,0.1);color:#9ca3af', 'อนุบาล': 'rgba(251,191,36,0.15);color:#fbbf24', 'ประถม': 'rgba(16,185,129,0.15);color:#34d399', 'มัธยม': 'rgba(99,102,241,0.15);color:#818cf8', 'ประถม-มัธยม': 'rgba(14,165,233,0.15);color:#38bdf8' };
 
     return `<div class="glass-card rounded-2xl p-5 flex flex-col gap-4 fade-in stagger-${(i % 6) + 1}">
       <div class="flex items-start justify-between">
