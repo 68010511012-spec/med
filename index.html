@@ -4,10 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบลงทะเบียนสังเกตการสอน</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  
+  <!-- แก้ไขเวอร์ชัน Tailwind ไม่ให้หน้าขาว -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <!-- เพิ่ม Script ของ Google Login -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <!-- แก้ไขสคริปต์ Google ลบ async defer ออกให้โหลดทันที -->
+  <script src="https://accounts.google.com/gsi/client"></script>
+  
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
   * { font-family: 'Sarabun', sans-serif; }
@@ -142,7 +146,9 @@
        <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="map-pin" style="width:20px;height:20px;color:#f472b6;"></i>รายชื่อโรงเรียน</h2>
        <button onclick="fetchRegistrations()" class="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> รีเฟรชข้อมูล</button>
      </div>
-     <div id="schools-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+     <div id="schools-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p class="text-gray-400 text-sm col-span-full">กำลังโหลดข้อมูล...</p>
+     </div>
     </main>
    </div>
 
@@ -183,24 +189,16 @@
 const GOOGLE_CLIENT_ID = '257299402825-el5mheppr6fnd09mebi7vmgulilqg9ru.apps.googleusercontent.com';
 
 // ⚠️ สำคัญ: ใส่ Web App URL ที่ได้จาก Google Apps Script ด้านล่างนี้
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw33AK_x54Gx69fIGd9ZHrE8XYFbkZGBFPFVxlQaH5k4PkKSIp2cWkSXEQcaA47WUQU/exec'; 
+const GOOGLE_APP_SCRIPT_URL = 'ใส่_WEB_APP_URL_จาก_GAS_ของคุณที่นี่'; 
 
 const ALLOWED_DOMAIN = 'msu.ac.th'; // กำหนดโดเมนมหาวิทยาลัยมหาสารคาม
 const ADMIN_PASSWORD = 'admin'; // รหัสผ่านสำหรับเข้าหน้า Admin Dashboard
 
-// === SCHOOLS DATA ===
-const SCHOOLS = [
-  { id: 's1', name: 'โรงเรียนวัดสุทธิวราราม', district: 'สาทร', level: 'มัธยม', capacity: 5, emoji: '🏫', color: '#6366f1' },
-  { id: 's2', name: 'โรงเรียนสวนกุหลาบวิทยาลัย', district: 'พระนคร', level: 'มัธยม', capacity: 4, emoji: '🌹', color: '#ec4899' },
-  { id: 's3', name: 'โรงเรียนอนุบาลสามเสน', district: 'ดุสิต', level: 'อนุบาล', capacity: 3, emoji: '🧒', color: '#f59e0b' },
-  { id: 's4', name: 'โรงเรียนราชวินิต', district: 'ดุสิต', level: 'ประถม', capacity: 4, emoji: '📚', color: '#10b981' },
-  { id: 's5', name: 'โรงเรียนเทพศิรินทร์', district: 'ป้อมปราบฯ', level: 'มัธยม', capacity: 5, emoji: '⭐', color: '#8b5cf6' },
-  { id: 's6', name: 'โรงเรียนสาธิตจุฬาฯ', district: 'ปทุมวัน', level: 'ประถม-มัธยม', capacity: 3, emoji: '🎓', color: '#0ea5e9' },
-];
-
+// === VARIABLES ===
 let currentUser = null;
 let currentAdminPassword = null;
 let allRegistrations = [];
+let SCHOOLS = []; // ข้อมูลโรงเรียนจะถูกดึงมาจาก Google Sheets
 
 window.onload = function () {
   lucide.createIcons();
@@ -216,7 +214,7 @@ window.onload = function () {
   );
 
   // โหลดข้อมูลอัตโนมัติเมื่อเปิดเว็บ
-  if(GOOGLE_APP_SCRIPT_URL !== 'ใส่_WEB_APP_URL_จาก_GAS_ของคุณที่นี่') {
+  if(GOOGLE_APP_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbxP16LXPY6NmgQWuukq5KrXftgczYwEoQSVPlCfrZ4ringR1nM3DZWnO_OsIqDFASAf/exec') {
     fetchRegistrations();
   }
 };
@@ -263,12 +261,17 @@ async function fetchRegistrations() {
   
   try {
     const response = await fetch(GOOGLE_APP_SCRIPT_URL);
-    allRegistrations = await response.json();
+    const data = await response.json();
+    
+    // รับค่าจาก Google Sheets 
+    allRegistrations = data.registrations || [];
+    SCHOOLS = data.schools || [];
     
     if (currentUser) renderSchools();
     if (currentAdminPassword) renderAdminDashboard();
   } catch (error) {
     console.error("Fetch Error: ", error);
+    showToast('ไม่สามารถโหลดข้อมูลได้ โปรดตรวจสอบ URL ของ Apps Script', 'error');
   }
 }
 
@@ -305,6 +308,8 @@ async function registerSchool(schoolId) {
 
 async function cancelRegistration(schoolId) {
   const sc = SCHOOLS.find(s => s.id === schoolId);
+  if (!sc) return;
+  
   showConfirm(`ยืนยันการยกเลิกการลงทะเบียน ${sc.name}?`, async () => {
     showToast('กำลังดำเนินการ...', 'warn');
     try {
@@ -402,7 +407,7 @@ function renderSchools() {
   const mySection = document.getElementById('my-section');
   const myRegs = getMyRegistrations();
 
-  const totalCap = SCHOOLS.reduce((s, sc) => s + sc.capacity, 0);
+  const totalCap = SCHOOLS.reduce((s, sc) => s + Number(sc.capacity), 0);
   const totalReg = allRegistrations.length;
   document.getElementById('stat-schools').textContent = SCHOOLS.length;
   document.getElementById('stat-registered').textContent = totalReg;
@@ -417,7 +422,7 @@ function renderSchools() {
       const date = new Date(r.registered_at);
       return `<div class="glass-card rounded-xl p-4 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <span class="text-2xl">${sc.emoji}</span>
+          <span class="text-2xl">${sc.emoji || '🏫'}</span>
           <div>
             <p class="text-white font-semibold text-sm">${sc.name}</p>
             <p class="text-gray-400 text-xs">ลงทะเบียนเมื่อ ${date.toLocaleDateString('th-TH')}</p>
@@ -433,13 +438,19 @@ function renderSchools() {
     myList.innerHTML = '';
   }
 
+  if (SCHOOLS.length === 0) {
+    grid.innerHTML = '<p class="text-gray-400 text-sm col-span-full">ไม่พบข้อมูลโรงเรียน หรือกำลังโหลด...</p>';
+    return;
+  }
+
   grid.innerHTML = SCHOOLS.map((sc, i) => {
     const regs = getSchoolRegistrations(sc.id);
     const count = regs.length;
-    const pct = Math.min(100, (count / sc.capacity) * 100);
-    const isFull = count >= sc.capacity;
+    const capacity = Number(sc.capacity) || 0;
+    const pct = Math.min(100, (count / capacity) * 100);
+    const isFull = count >= capacity;
     const alreadyRegistered = myRegs.some(r => r.school_id === sc.id);
-    const barColor = isFull ? '#ef4444' : pct > 70 ? '#f59e0b' : sc.color;
+    const barColor = isFull ? '#ef4444' : pct > 70 ? '#f59e0b' : (sc.color || '#6366f1');
 
     let btnHtml;
     if (alreadyRegistered) {
@@ -447,7 +458,7 @@ function renderSchools() {
     } else if (isFull) {
       btnHtml = `<button disabled class="btn-register w-full py-2.5 rounded-xl bg-white/5 text-gray-500 text-sm font-medium">เต็มแล้ว</button>`;
     } else {
-      btnHtml = `<button onclick="registerSchool('${sc.id}')" class="btn-register w-full py-2.5 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,${sc.color},${sc.color}dd);">ลงทะเบียน</button>`;
+      btnHtml = `<button onclick="registerSchool('${sc.id}')" class="btn-register w-full py-2.5 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,${sc.color || '#6366f1'},${sc.color || '#6366f1'}dd);">ลงทะเบียน</button>`;
     }
 
     const levelColors = { 'อนุบาล': 'rgba(251,191,36,0.15);color:#fbbf24', 'ประถม': 'rgba(16,185,129,0.15);color:#34d399', 'มัธยม': 'rgba(99,102,241,0.15);color:#818cf8', 'ประถม-มัธยม': 'rgba(14,165,233,0.15);color:#38bdf8' };
@@ -455,23 +466,23 @@ function renderSchools() {
     return `<div class="glass-card rounded-2xl p-5 flex flex-col gap-4 fade-in stagger-${(i % 6) + 1}">
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
-          <span class="text-3xl">${sc.emoji}</span>
+          <span class="text-3xl">${sc.emoji || '🏫'}</span>
           <div>
             <h3 class="text-white font-bold text-sm leading-tight">${sc.name}</h3>
             <p class="text-gray-400 text-xs mt-0.5 flex items-center gap-1"><i data-lucide="map-pin" style="width:12px;height:12px;"></i>${sc.district}</p>
           </div>
         </div>
-        <span class="tag-badge" style="background:${levelColors[sc.level] || levelColors['มัธยม']}">${sc.level}</span>
+        <span class="tag-badge" style="background:${levelColors[sc.level] || levelColors['มัธยม']}">${sc.level || '-'}</span>
       </div>
       <div>
         <div class="flex justify-between text-xs mb-1.5">
           <span class="text-gray-400">จำนวนที่ลงทะเบียน</span>
-          <span class="font-semibold" style="color:${barColor}">${count} / ${sc.capacity}</span>
+          <span class="font-semibold" style="color:${barColor}">${count} / ${capacity}</span>
         </div>
         <div class="capacity-bar"><div class="capacity-fill" style="width:${pct}%;background:${barColor};"></div></div>
       </div>
       ${count > 0 ? `<div class="flex items-center gap-1">
-        <div class="flex -space-x-2">${regs.slice(0,3).map(r => `<div class="avatar-ring text-[10px]" style="background:${sc.color};color:#fff;border:2px solid #0f1729;" title="${r.user_name}">${r.user_name.charAt(0)}</div>`).join('')}</div>
+        <div class="flex -space-x-2">${regs.slice(0,3).map(r => `<div class="avatar-ring text-[10px]" style="background:${sc.color || '#6366f1'};color:#fff;border:2px solid #0f1729;" title="${r.user_name}">${r.user_name.charAt(0)}</div>`).join('')}</div>
         ${count > 3 ? `<span class="text-gray-400 text-xs ml-1">+${count-3} คน</span>` : ''}
       </div>` : '<p class="text-gray-500 text-xs">ยังไม่มีผู้ลงทะเบียน</p>'}
       ${btnHtml}
@@ -482,7 +493,7 @@ function renderSchools() {
 }
 
 function renderAdminDashboard() {
-  const totalCap = SCHOOLS.reduce((s, sc) => s + sc.capacity, 0);
+  const totalCap = SCHOOLS.reduce((s, sc) => s + Number(sc.capacity), 0);
   const totalReg = allRegistrations.length;
   const totalPending = Math.max(0, totalCap - totalReg);
 
@@ -516,20 +527,21 @@ function renderAdminDashboard() {
   document.getElementById('admin-schools').innerHTML = SCHOOLS.map((sc, i) => {
     const regs = getSchoolRegistrations(sc.id);
     const count = regs.length;
-    const pct = (count / sc.capacity) * 100;
-    const isFull = count >= sc.capacity;
+    const capacity = Number(sc.capacity) || 0;
+    const pct = capacity > 0 ? (count / capacity) * 100 : 100;
+    const isFull = count >= capacity;
 
     return `<div class="glass-card rounded-2xl p-6 fade-in stagger-${(i % 6) + 1}">
       <div class="flex items-start justify-between mb-4">
         <div class="flex items-center gap-3">
-          <span class="text-4xl">${sc.emoji}</span>
+          <span class="text-4xl">${sc.emoji || '🏫'}</span>
           <div>
             <h3 class="text-white font-bold text-lg">${sc.name}</h3>
             <p class="text-gray-400 text-sm">📍 ${sc.district}</p>
           </div>
         </div>
         <div class="text-right">
-          <p class="text-white font-bold text-2xl">${count} <span class="text-sm text-gray-400">/ ${sc.capacity}</span></p>
+          <p class="text-white font-bold text-2xl">${count} <span class="text-sm text-gray-400">/ ${capacity}</span></p>
           <p class="text-xs ${isFull ? 'text-red-400' : pct > 70 ? 'text-yellow-400' : 'text-green-400'}">${isFull ? '⚠️ เต็มแล้ว' : pct > 70 ? '📊 เกือบเต็ม' : '✓ มีที่ว่าง'}</p>
         </div>
       </div>
@@ -539,7 +551,7 @@ function renderAdminDashboard() {
           <span class="text-gray-400">ความนิยม</span>
           <span class="font-semibold text-white">${pct.toFixed(0)}%</span>
         </div>
-        <div class="capacity-bar"><div class="capacity-fill" style="width:${pct}%;background:${isFull ? '#ef4444' : pct > 70 ? '#f59e0b' : sc.color};"></div></div>
+        <div class="capacity-bar"><div class="capacity-fill" style="width:${pct}%;background:${isFull ? '#ef4444' : pct > 70 ? '#f59e0b' : (sc.color || '#6366f1')};"></div></div>
       </div>
 
       ${count > 0 ? `<div class="border-t border-white/10 pt-4">
